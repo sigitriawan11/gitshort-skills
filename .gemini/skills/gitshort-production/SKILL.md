@@ -13,14 +13,17 @@ This skill automates the full 4-phase production workflow for creating vertical 
 2. **Media & Render Directory (Git-Ignored):**
    - By default, store heavy media files (`assets/`, `audio/`, `comps/`, `output/`) inside `./workspace-render/<content_slug>/` (or use `RENDER_ROOT_DIR` if defined in `.env`).
 3. **Automatic OS / WSL Path Translation for MCP Tools:**
-   - Because `vectorcraft`, `effectcraft`, and `filmcraft` run as Windows binaries, resolve `./workspace-render/<content_slug>` into a native Windows path before calling any MCP tool:
-     - **If running inside WSL:** Run `wslpath -w ./workspace-render/<content_slug>` via bash to obtain the exact Windows path (e.g., `D:\...` or `\\wsl.localhost\...`).
-     - **If running on native Windows:** Resolve the absolute Windows path directly (`Resolve-Path` / `abspath`).
+   - Resolve `./workspace-render/<content_slug>` into a native Windows path before calling any MCP tool:
+     - **If running inside WSL:** Run `wslpath -w ./workspace-render/<content_slug>` via bash to obtain the exact Windows path.
+     - **If running on native Windows:** Resolve the absolute Windows path directly.
    - Always pass the resolved Windows path to MCP tools, and use standard POSIX/relative paths for local Python/FFmpeg commands.
 
 ## Visual & Technical Standards
 1. **No Blender Policy:** Achieve 3D spatial depth strictly via **2.5D multi-plane parallax layers** and **Glow/Lighting effects** inside EffectCraft.
-2. **Cohesive Sticker Aesthetic:** All characters and foreground/midground props must be flat vector paper-cutout illustrations with thick white outer borders and soft drop shadows on transparent PNG backgrounds.
+2. **Articulated 2D Cartoon Character Standard (CRITICAL):**
+   - **NEVER build characters out of primitive geometric blocks** (no boxy rectangle torsos, no floating circle hands without arms, no featureless circle heads).
+   - Every human character MUST be drawn with **full articulated cartoon anatomy**: distinct head with ears, hair/headwear (e.g., peci/cap), expressive eyebrows, eyes with pupils, nose, and mouth; a distinct neck; structured torso with shirt collar, buttons, or clothing folds; **connected upper and lower arms with sleeves/cuffs and hands**; separated legs with trousers/sarong folds; and detailed shoes/sandals.
+   - Maintain a **three-quarter (3/4) front-facing stance** with bold, consistent dark outlines (`#1A1A1A`), flat cel-shaded colors with subtle clothing patterns/folds, a thick white paper-cutout sticker border (`#FFFFFF`), and a soft drop shadow on a transparent PNG background.
 3. **Full-Bleed Backgrounds:** Landscape/sky backgrounds (`latar_utama.png`, `2160x1920`) must be full-bleed without white sticker borders.
 
 ---
@@ -43,7 +46,9 @@ When asked to create a new standalone video or episode with slug `<content_slug>
 
 ## Phase 1: Paper-Cutout Asset Generation (`vectorcraft` MCP)
 Resolve `<win_render_dir>` first, then use the `vectorcraft` MCP server to generate and export transparent PNG assets into `<win_render_dir>\assets\`:
-1. **Characters (`assets\characters\`):** Generate protagonist poses (`<char>_jalan.png`, `<char>_diam.png`, `<char>_kaget.png`) and secondary/antagonist characters in matching paper-cutout sticker style.
+1. **Characters (`assets\characters\`):**
+   - Build a reusable base character rig/group first (head, neck, articulated arms with sleeves, torso with clothing details, legs, and footwear) so proportions, outfit details, and face remain 100% consistent across `<char>_jalan.png`, `<char>_diam.png`, and `<char>_kaget.png`—only adjusting limb angles, eyebrows, eyes, and mouth per pose.
+   - Wrap the final character group in a smooth contour-following white sticker border and drop shadow.
 2. **Environment (`assets\environment\`):** Generate props/structures with sticker borders plus one wide parallax background (`latar_utama.png`, `2160x1920`, no white border).
 3. **Verification:** Confirm every PNG file in `./workspace-render/<content_slug>/assets/` exists and is non-empty (`> 0 KB`) before proceeding.
 
