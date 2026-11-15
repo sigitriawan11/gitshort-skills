@@ -27,7 +27,10 @@ This skill automates the full 4-phase production workflow for creating vertical 
    - **NEVER build characters out of primitive geometric blocks** (no boxy rectangle torsos, no floating circle hands without arms, no featureless circle heads).
    - Every human character MUST be drawn with **full articulated cartoon anatomy**: distinct head with ears, hair/headwear, expressive eyebrows, eyes with pupils, nose, and mouth; a distinct neck; structured torso with shirt collar, buttons, or clothing folds; **connected upper and lower arms with sleeves/cuffs and hands**; separated legs with trousers/sarong folds; and detailed shoes/sandals.
    - Maintain a **three-quarter (3/4) front-facing stance** with bold, consistent dark outlines (`#1A1A1A`) and flat cel-shaded colors.
-4. **Full-Bleed Backgrounds:** Landscape/room backgrounds (`latar_utama.png`, `2160x1920`) must be full-bleed edge-to-edge without borders.
+4. **Rich Facial Expressions & Lip-Sync Mouth Variants:**
+   - Every speaking character MUST have both **closed-mouth** and **open-mouth speaking** variants (e.g., `<char>_diam.png` and `<char>_bicara.png`) plus distinct emotional expressions tailored to the story (`<char>_jalan.png`, `<char>_kaget.png`, `<char>_senyum.png`, `<char>_kesal.png`, `<char>_bingung.png`).
+   - Keep body, head position, and clothing anchor coordinates identical between `<char>_diam.png` and `<char>_bicara.png` so alternating them produces clean, jitter-free lip movement.
+5. **Full-Bleed Backgrounds:** Landscape/room backgrounds (`latar_utama.png`, `2160x1920`) must be full-bleed edge-to-edge without borders.
 
 ---
 
@@ -42,15 +45,16 @@ When asked to create a new standalone video or episode with slug `<content_slug>
    - `./workspace-render/<content_slug>/output/`
 2. Write `./konten/<content_slug>/produksi.md` containing:
    - **Clean Narration Script (Plain Text):** Original Indonesian story (~180–220 words for 75–85 seconds) with a strong 3-second hook, rising tension/comedy, climax, and twist/resolution. Must be strictly plain text (no timestamps or bracketed stage directions) so it feeds directly into TTS.
-   - **Asset Manifest:** Exact list of character poses/expressions and environment props required.
-   - **SFX & Cue Sheet:** Sound effects and lighting/animation triggers mapped to story beats.
+   - **Asset Manifest:** Exact list of character poses/expressions (explicitly including `_bicara` open-mouth variants for any character with spoken dialogue) and environment props required.
+   - **Dialogue & Cue Sheet:** Map which character speaks during each quoted dialogue line, along with sound effects and lighting/animation triggers.
 
 ---
 
 ## Phase 1: Clean 2D Vector Asset Generation (`vectorcraft` MCP)
 Resolve `<win_render_dir>` first, then use the `vectorcraft` MCP server to generate and export transparent PNG assets into `<win_render_dir>\assets\`:
 1. **Characters (`assets\characters\`):**
-   - Build a reusable base character rig/group first (head, neck, articulated arms with sleeves, torso with clothing details, legs, and footwear) so proportions, outfit details, and face remain 100% consistent across poses—only adjusting limb angles, eyebrows, eyes, and mouth per pose.
+   - Build a reusable base character rig/group first (head, neck, articulated arms with sleeves, torso with clothing details, legs, and footwear) so proportions, outfit details, and face remain 100% consistent across all poses.
+   - Export varied emotional expressions AND a dedicated open-mouth `<char>_bicara.png` variant for every character who speaks dialogue in the script.
    - Export directly with transparent background (no white border, no shadow layer).
 2. **Environment (`assets\environment\`):** Generate clean transparent props/furniture (no white border, no shadow layer) plus one wide full-bleed parallax background (`latar_utama.png`, `2160x1920`).
 3. **Verification:** Confirm every PNG file in `./workspace-render/<content_slug>/assets/` exists, is non-empty (`> 0 KB`), and has true transparent alpha background (except `latar_utama.png`) before proceeding.
@@ -70,14 +74,17 @@ Execute local shell/Python commands to generate audio in `./workspace-render/<co
 
 ---
 
-## Phase 3: 2.5D Parallax Animation & Lighting (`effectcraft` MCP)
+## Phase 3: 2.5D Parallax Animation, Lip-Sync & Lighting (`effectcraft` MCP)
 Read timestamps from `./konten/<content_slug>/vo_narasi.srt` and use `effectcraft` MCP to build `<win_render_dir>\comps\scene_utama.ecproj` (`1080x1920`, `30fps`, exact duration of `vo_narasi.mp3`):
 1. **Multi-Plane Depth Setup:** Layer background, floor/ground, midground structures/furniture, and characters on separate Z-depth/parallax planes with color grading matching the story mood.
-2. **Animation & Lighting Choreography:**
-   - Animate character movement with vertical step-bobbing (`0.25s` cycle) and horizontal scale flips (`100%` to `-100%`).
-   - Synchronize expression swaps and lighting changes to the exact `.srt` timestamps.
+2. **Dialogue Lip-Sync & Varied Expression Choreography:**
+   - Identify every `.srt` subtitle segment containing spoken character dialogue (quoted speech).
+   - During the exact start-to-end timestamps of a character's dialogue line, animate **lip-sync mouth movement** by rapidly toggling visibility/opacity (`0%` / `100%` hold keyframes every `0.15s`) between the character's closed-mouth pose (`_diam` or emotional pose) and open-mouth speaking pose (`_bicara`), accompanied by subtle head/upper-body emphasis (`1%–2%` scale/rotation pulse). Immediately return to the closed-mouth expression when the dialogue line ends.
+   - Switch between varied emotional poses (`_jalan`, `_diam`, `_kaget`, `_senyum`, `_kesal`, `_bingung`) across narrative beats so characters never look static.
+3. **Movement & Camera:**
+   - Animate walking with vertical step-bobbing (`0.25s` cycle) and horizontal scale flips (`100%` to `-100%`).
    - Animate camera panning and zoom-in on key story reveals.
-3. **Render Raw Video:** Export to `<win_render_dir>\output\animasi_mentah.mp4`.
+4. **Render Raw Video:** Export to `<win_render_dir>\output\animasi_mentah.mp4`.
 
 ---
 
