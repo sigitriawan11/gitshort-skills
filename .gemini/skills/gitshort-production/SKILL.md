@@ -102,3 +102,15 @@ Use `filmcraft` MCP to assemble the final video at `<win_render_dir>\output\fina
 ## Blender 5.x Compatibility Rules
 - **No Context Ops:** Build all meshes/objects using low-level Data API (`bpy.data.meshes.new`, `bmesh`, `bpy.data.objects.new`, `collection.objects.link`) instead of `bpy.ops.mesh` or `bpy.context.active_object`.
 - **Slotted Actions:** Never access `action.fcurves` directly (removed in Blender 5.0+); for instant cuts, insert a duplicate keyframe at `frame - 1` or iterate `action.layers[0].strips[0].channelbag(anim_data.action_slot).fcurves`.
+
+## Windows Interactive Session Bridge (Anti-Session-0 Hang)
+- **NEVER** invoke `blender.exe` directly via WSL bash or `Start-Process` from background agent subshells, as Windows isolates background subshells in Session 0 where Blender 5.x GPU initialization freezes at ~2.5 MB RAM.
+- **ALWAYS** execute `blender.exe` via Windows Task Scheduler with `/IT` (Interactive Token) so it runs in the active desktop user session with full GPU access, and poll until `blender.exe` exits:
+  ```bash
+  WIN_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
+  TASK_NAME="GitShortBlenderRender"
+  schtasks.exe /Create /TN "$TASK_NAME" /TR "\"C:\Program Files\Blender Foundation\Blender 5.3\blender.exe\" --background --python \"<win_script_path>\"" /SC ONCE /ST 23:59 /RU "$WIN_USER" /IT /F
+  schtasks.exe /Run /TN "$TASK_NAME"
+  sleep 5
+  while tasklist.exe 2>/dev/null | grep -qi "blender.exe"; do sleep 10; done
+  schtasks.exe /Delete /TN "$TASK_NAME" /F
