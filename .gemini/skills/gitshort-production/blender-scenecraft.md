@@ -27,3 +27,9 @@ Hindari warna datar (*flat color*) tanpa tekstur. Selalu kombinasikan `Roughness
 - **Key Light:** `AREA` light utama (`size = 2.0–3.0`) untuk menerangi aktor utama dengan bayangan lembut.
 - **Rim / Back Light:** `SPOT` atau `AREA` light berlawanan arah kamera dengan warna kontras (hangat untuk siang/senja, biru dingin atau neon untuk malam/misteri) untuk memisahkan siluet aktor 2D dari latar 3D.
 - **Practical Lights:** Setiap objek sumber cahaya di dalam adegan (lampu gantung, lilin, lampu motor, layar TV, obor) wajib memiliki `POINT` light kecil di dalamnya agar cahayanya benar-benar memantul ke lingkungan sekitar.
+
+## 5. Living 3D Environment & Dynamic Props (Anti-Static Background Rule)
+Never leave the 3D environment completely frozen like a still painting. In every scene, animate at least **2–3 environmental props** in `build_and_render.py` so the world feels alive:
+- **Continuous Mechanical Motion:** Rotate fan blades (`rotation_euler` continuous spin), swing hanging lamps or signs gently (`sin()` wave ±3°–5°), or spin vehicle wheels when moving.
+- **Atmospheric & Ambient Motion:** Animate rising steam puffs above hot food/drinks (cyclic Z-rise + scale fade), swaying curtains/banners/foliage in the breeze (subtle rhythmic rotation/scale wave), or drifting fireflies/dust motes in outdoor night scenes.
+- **Interactive Story Props:** Whenever a character interacts with a 3D prop (e.g., tripping over a cable, knocking over a glass, opening a door, camera flash firing, or rice mound shrinking per spoonful), animate the 3D object's transform (`location`, `rotation_euler`, `scale`) or material `Emission Strength` in sync with the action beat.
