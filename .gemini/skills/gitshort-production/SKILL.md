@@ -122,3 +122,8 @@ Use `filmcraft` MCP to assemble the final video at `<win_render_dir>\output\fina
   - *Startled / Shocked:* Quick 3-frame squash-and-stretch pop (`scale Z: 0.92 -> 1.08 -> 1.00`).
   - *Sneaking / Whispering / Leaning in:* Subtle Y-rotation tilt (`5°–10°`) toward the other character.
   - *Shivering / Scared:* Rapid micro-oscillation on X-location (`±0.015m`).
+
+## Dynamic 3D Overlay VFX on 2D Characters (Blender)
+- **Never Bake Animated Effects into Static 2D PNGs:** Keep character PNGs focused on facial expressions and body poses. Dynamic effects—such as falling tears, dripping sweat, floating steam, anger veins, exclamation/question pops, or dust puffs—MUST be generated as animated 3D meshes/particles in Blender (`build_and_render.py`) anchored relative to the character's head/eye coordinates.
+- **Tears & Sweat Drop Recipe:** Create glossy translucent blue 3D teardrop meshes (`Transmission = 0.85`, `Roughness = 0.05`) positioned at the character's eye/temple level, and animate cyclic Z-axis drop + scale fade (`0.0 -> 1.0 -> 0.0` over 12–18 frames) during crying or panic beats.
+- **Comic/Cartoon Emotion Pops:** Spawn stylized 3D symbols (`!`, `?`, steam puffs) above the character's head with a 4-frame pop-in scale bounce when surprised, confused, or angry.
