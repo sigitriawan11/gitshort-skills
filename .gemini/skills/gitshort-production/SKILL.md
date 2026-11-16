@@ -98,3 +98,7 @@ Use `filmcraft` MCP to assemble the final video at `<win_render_dir>\output\fina
    - **Track 3 (Point SFX):** Align transient sound effects to exact animation frames.
    - **Track 4 (BGM):** Background music at `-20 dB` throughout.
 3. **Export:** Render H.264 MP4 (`1080x1920`, `30fps`, AAC audio) to `<win_render_dir>\output\final_shorts.mp4` and report completion to the user.
+
+## Blender 5.x Compatibility Rules
+- **No Context Ops:** Build all meshes/objects using low-level Data API (`bpy.data.meshes.new`, `bmesh`, `bpy.data.objects.new`, `collection.objects.link`) instead of `bpy.ops.mesh` or `bpy.context.active_object`.
+- **Slotted Actions:** Never access `action.fcurves` directly (removed in Blender 5.0+); for instant cuts, insert a duplicate keyframe at `frame - 1` or iterate `action.layers[0].strips[0].channelbag(anim_data.action_slot).fcurves`.
