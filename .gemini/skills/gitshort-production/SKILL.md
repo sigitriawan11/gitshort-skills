@@ -74,7 +74,7 @@ Execute local shell/Python commands to generate audio in `./workspace-render/<co
 ## Phase 3: Hybrid 3D Stage & Animation (`Blender CLI bpy`)
 Parse timestamps from `./konten/<content_slug>/vo_narasi.srt` and write a self-contained Python script `./workspace-render/<content_slug>/scenes/build_and_render.py` executed headless via Blender CLI (`blender.exe --background --python <win_script_path>`):
 1. **Render Engine & Output Config:**
-   - Use `BLENDER_EEVEE_NEXT` (or `BLENDER_EEVEE`), resolution `1080x1920`, `30 fps`, total frames = `ceil(audio_duration * 30)`, output to `<win_render_dir>\output\animasi_mentah.mp4` (`FFMPEG` / `MPEG4` / `H264`).
+   - Use `BLENDER_EEVEE_NEXT` (or `BLENDER_EEVEE`), resolution `1080x1920`, `30 fps`, total frames = `ceil(audio_duration * 30)`, render an image sequence (`file_format = 'PNG'` or `'JPEG'`) to `<win_render_dir>\output\frames\frame_####.png` (for compatibility with Blender 5.x where direct `FFMPEG` enum was removed), then encode `animasi_mentah.mp4` at 30fps via local `ffmpeg`.
    - Enable shadows and clean stylized color management (`Standard` or `AgX` with vibrant contrast).
 2. **Procedural Low-Poly 3D Environment:**
    - Build the full 3D scene matching the story setting using clean low-poly meshes and matte/stylized materials (ground/grass/road/floor, stylized faceted trees/foliage, buildings/walls/furniture, props, sky gradient/world lighting, key sun/area light casting soft shadows, and subtle depth fog).
