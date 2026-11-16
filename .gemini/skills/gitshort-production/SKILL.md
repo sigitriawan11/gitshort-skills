@@ -114,3 +114,11 @@ Use `filmcraft` MCP to assemble the final video at `<win_render_dir>\output\fina
   sleep 5
   while tasklist.exe 2>/dev/null | grep -qi "blender.exe"; do sleep 10; done
   schtasks.exe /Delete /TN "$TASK_NAME" /F
+
+## Dynamic Story-Driven Character Acting (Anti-Rigid Expression Rule)
+- **NO Fixed/Generic Expression Templates:** Do NOT hardcode a rigid 4-pose list (`diam`, `bicara`, `kaget`, `senyum`) across every story. Instead, analyze the beat-by-beat emotional arc of the script and generate **4–6 custom, context-specific expression/pose PNGs per character** in VectorCraft that match what the character is actually doing in that episode (e.g., `melirik_curiga`, `menahan_tawa`, `menguap_lelah`, `berbisik_panik`, `menunjuk_sinis`, `mengelus_perut`, `menangis_histeris`).
+- **Blender Secondary Motion & Acting:** In `build_and_render.py`, do not just swap static billboards—pair expression swaps with subtle 3D transform acting:
+  - *Talking / Arguing:* Slight rhythmic Z-scale bounce (1.00 to 1.04) synced to speech beats.
+  - *Startled / Shocked:* Quick 3-frame squash-and-stretch pop (`scale Z: 0.92 -> 1.08 -> 1.00`).
+  - *Sneaking / Whispering / Leaning in:* Subtle Y-rotation tilt (`5°–10°`) toward the other character.
+  - *Shivering / Scared:* Rapid micro-oscillation on X-location (`±0.015m`).
